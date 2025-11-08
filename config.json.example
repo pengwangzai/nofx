@@ -1,0 +1,22 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": "8080"
+  },
+  "database": {
+    "driver": "sqlite3",
+    "connection_string": ":memory:"
+  },
+  "api": {
+    "timeout": 30,
+    "rate_limit": 100
+  },
+  "logging": {
+    "level": "info",
+    "file": "logs/app.log"
+  },
+  "trading": {
+    "default_leverage": 10,
+    "max_position_size": 10000
+  }
+}
