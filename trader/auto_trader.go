@@ -176,6 +176,9 @@ func NewAutoTrader(config AutoTraderConfig, database interface{}, userID string)
 	case "binance":
 		log.Printf("🏦 [%s] 使用币安合约交易", config.Name)
 		trader = NewFuturesTrader(config.BinanceAPIKey, config.BinanceSecretKey, userID)
+	case "gateio", "gate.io":
+		log.Printf("🏦 [%s] 使用Gate.io合约交易", config.Name)
+		trader = NewGateIOFuturesTrader(config.BinanceAPIKey, config.BinanceSecretKey)
 	case "hyperliquid":
 		log.Printf("🏦 [%s] 使用Hyperliquid交易", config.Name)
 		trader, err = NewHyperliquidTrader(config.HyperliquidPrivateKey, config.HyperliquidWalletAddr, config.HyperliquidTestnet)
