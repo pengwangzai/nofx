@@ -279,6 +279,7 @@ func (d *Database) initDefaultData() error {
 		id, name, typ string
 	}{
 		{"binance", "Binance Futures", "binance"},
+		{"gateio", "Gate.io", "cex"},
 		{"hyperliquid", "Hyperliquid", "hyperliquid"},
 		{"aster", "Aster DEX", "aster"},
 	}
@@ -822,6 +823,9 @@ func (d *Database) UpdateExchange(userID, id string, enabled bool, apiKey, secre
 		var name, typ string
 		if id == "binance" {
 			name = "Binance Futures"
+			typ = "cex"
+		} else if id == "gateio" || id == "gate.io" {
+			name = "Gate.io"
 			typ = "cex"
 		} else if id == "hyperliquid" {
 			name = "Hyperliquid"

@@ -556,6 +556,8 @@ func (s *Server) handleCreateTrader(c *gin.Context) {
 		switch req.ExchangeID {
 		case "binance":
 			tempTrader = trader.NewFuturesTrader(exchangeCfg.APIKey, exchangeCfg.SecretKey, userID)
+		case "gateio", "gate.io":
+			tempTrader = trader.NewGateIOFuturesTrader(exchangeCfg.APIKey, exchangeCfg.SecretKey)
 		case "hyperliquid":
 			tempTrader, createErr = trader.NewHyperliquidTrader(
 				exchangeCfg.APIKey, // private key
@@ -917,6 +919,8 @@ func (s *Server) handleSyncBalance(c *gin.Context) {
 	switch traderConfig.ExchangeID {
 	case "binance":
 		tempTrader = trader.NewFuturesTrader(exchangeCfg.APIKey, exchangeCfg.SecretKey, userID)
+	case "gateio", "gate.io":
+		tempTrader = trader.NewGateIOFuturesTrader(exchangeCfg.APIKey, exchangeCfg.SecretKey)
 	case "hyperliquid":
 		tempTrader, createErr = trader.NewHyperliquidTrader(
 			exchangeCfg.APIKey,
@@ -1977,27 +1981,33 @@ func (s *Server) handleGetSupportedModels(c *gin.Context) {
 
 // handleGetSupportedExchanges 获取系统支持的交易所列表
 func (s *Server) handleGetSupportedExchanges(c *gin.Context) {
-	// 返回系统支持的交易所（从default用户获取）
-	exchanges, err := s.database.GetExchanges("default")
-	if err != nil {
-		log.Printf("❌ 获取支持的交易所失败: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "获取支持的交易所失败"})
-		return
-	}
-
-	// 转换为安全的响应结构，移除敏感信息
-	safeExchanges := make([]SafeExchangeConfig, len(exchanges))
-	for i, exchange := range exchanges {
-		safeExchanges[i] = SafeExchangeConfig{
-			ID:                    exchange.ID,
-			Name:                  exchange.Name,
-			Type:                  exchange.Type,
-			Enabled:               exchange.Enabled,
-			Testnet:               exchange.Testnet,
-			HyperliquidWalletAddr: "", // 默认配置不包含钱包地址
-			AsterUser:             "", // 默认配置不包含用户信息
-			AsterSigner:           "",
-		}
+	// 返回系统支持的交易所列表（硬编码，不依赖数据库配置）
+	// 这样即使数据库中没有配置，前端也能看到所有支持的交易所选项
+	safeExchanges := []SafeExchangeConfig{
+		{
+			ID:      "binance",
+			Name:    "Binance Futures",
+			Type:    "cex",
+			Enabled: false, // 默认未启用，需要用户配置API Key
+		},
+		{
+			ID:      "gateio",
+			Name:    "Gate.io",
+			Type:    "cex",
+			Enabled: false, // 默认未启用，需要用户配置API Key
+		},
+		{
+			ID:      "hyperliquid",
+			Name:    "Hyperliquid",
+			Type:    "dex",
+			Enabled: false, // 默认未启用，需要用户配置API Key
+		},
+		{
+			ID:      "aster",
+			Name:    "Aster DEX",
+			Type:    "dex",
+			Enabled: false, // 默认未启用，需要用户配置API Key
+		},
 	}
 
 	c.JSON(http.StatusOK, safeExchanges)
